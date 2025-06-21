@@ -90,9 +90,7 @@ if st.button(t("calculate", lang_code)):
 
     if flour:
         st.subheader("🧂 " + t("flour_choice", lang_code))
-        st.markdown(f"**{flour[lang_code]}**  
-Protein: {flour['protein']}%  
-Ash: {flour['ash']}%")
+        st.markdown(f"**{flour[lang_code]}**  Protein: {flour['protein']}%  Ash: {flour['ash']}%")
 
 # Water temperature calculator
 st.subheader("💧 " + t("water_temp", lang_code))
