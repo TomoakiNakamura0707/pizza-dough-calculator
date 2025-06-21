@@ -1,7 +1,6 @@
 # (C) Copyright All Rights Reserved. Tomoaki Nakamura 2025/06/22
 import streamlit as st
 
-
 st.set_page_config(page_title="Pizza Dough Calculator", page_icon="🍕", layout="centered")
 lang = st.radio("🌐 Language / 言語", ["English", "日本語"], horizontal=True)
 lang_code = "en" if lang == "English" else "ja"
@@ -71,13 +70,13 @@ if st.button(t("calculate", lang_code)):
     st.markdown(f"**Salt**: {salt_grams:.1f} g ({salt_percent:.2f}%)")
 
     FLOURS = [
-        {"key": "nuvola", "en": 'Caputo "0" Nuvola', "ja": "カプート ヌーヴォラ", "protein": 12.5, "ash": 0.50, "styles": ["Neapolitan"]},
-        {"key": "cuoco", "en": 'Caputo "00" Chef's Flour', "ja": "カプート クオーコ", "protein": 13.0, "ash": 0.55, "styles": ["Neapolitan", "Long Fermentation"]},
-        {"key": "pizzeria", "en": 'Caputo "00" Pizzeria', "ja": "カプート ピッツェリア", "protein": 12.75, "ash": 0.50, "styles": ["Neapolitan", "General Pizza"]},
-        {"key": "americana", "en": "Caputo Americana", "ja": "カプート アメリカーナ", "protein": 13.5, "ash": 0.55, "styles": ["New York Style"]},
-        {"key": "manitoba", "en": "Caputo Manitoba Oro", "ja": "カプート マニトバ オーロ", "protein": 14.5, "ash": 0.65, "styles": ["Chicago Deep Dish", "Frozen Pizza"]},
+        {"key": "nuvola", "en": "Caputo 0 Nuvola", "ja": "ヌーヴォラ（カプート）", "protein": 12.5, "ash": 0.50, "styles": ["Neapolitan"]},
+        {"key": "cuoco", "en": "Caputo 00 Chef's Flour", "ja": "クオーコ（カプート）", "protein": 13.0, "ash": 0.55, "styles": ["Neapolitan", "Long Fermentation"]},
+        {"key": "pizzeria", "en": "Caputo 00 Pizzeria Blue", "ja": "ピッツェリア（カプート）", "protein": 12.75, "ash": 0.50, "styles": ["Neapolitan", "General Pizza"]},
+        {"key": "americana", "en": "Caputo Americana", "ja": "アメリカーナ（カプート）", "protein": 13.5, "ash": 0.55, "styles": ["New York Style"]},
+        {"key": "manitoba", "en": "Caputo Manitoba Oro", "ja": "マニトバ オーロ（カプート）", "protein": 14.5, "ash": 0.65, "styles": ["Chicago Deep Dish", "Frozen Pizza"]},
         {"key": "camellia", "en": "Nisshin Camellia", "ja": "カメリア（日清）", "protein": 11.5, "ash": 0.40, "styles": ["All"]},
-        {"key": "lis_dor", "en": "Nisshin Lis D’or", "ja": "リスドォル（日清）", "protein": 11.8, "ash": 0.45, "styles": ["Neapolitan", "French", "Light Crust"]},
+        {"key": "lis_dor", "en": "Nisshin Lis D'or", "ja": "リスドォル（日清）", "protein": 11.8, "ash": 0.45, "styles": ["Neapolitan", "French", "Light Crust"]},
     ]
 
     manual = st.checkbox(t("manual_flour", lang_code))
