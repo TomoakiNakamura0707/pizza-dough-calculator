@@ -1,127 +1,105 @@
+# (C) Copyright All Rights Reserved. Tomoaki Nakamura 2025/06/22
 import streamlit as st
 
-# ---- Yeast calculation ----
-def calculate_multistage_yeast(flour_g, hydration_percent, stages):
-    base_temp = 20
-    base_hours = 6
-    base_yeast_percent = 0.5
-    Q10 = 2
 
-    total_activity_ratio = 0
-    for stage in stages:
-        hours = stage['hours']
-        temp = stage['temp']
-        temp_factor = Q10 ** ((temp - base_temp) / 10)
-        activity = temp_factor * hours
-        total_activity_ratio += activity
+st.set_page_config(page_title="Pizza Dough Calculator", page_icon="🍕", layout="centered")
+lang = st.radio("🌐 Language / 言語", ["English", "日本語"], horizontal=True)
+lang_code = "en" if lang == "English" else "ja"
 
-    base_activity = base_hours * 1
-    yeast_percent = base_yeast_percent * (base_activity / total_activity_ratio)
-    yeast_g = flour_g * (yeast_percent / 100)
-    water_g = flour_g * (hydration_percent / 100)
-
-    return round(yeast_percent, 3), round(yeast_g, 2), round(water_g, 2), round(total_activity_ratio, 2)
-
-# ---- Kneading Water Temperature Calculator ----
-def calc_water_temp(dough_temp_goal, room_temp, flour_temp, friction=4):
-    return round((dough_temp_goal * 3) - room_temp - flour_temp - friction, 1)
-
-# ---- Presets ----
-PRESETS = {
-    "Neapolitan": {
-        "hydration": 70,
-        "stages": [
-            {"hours": 2, "temp": 25},
-            {"hours": 18, "temp": 5},
-            {"hours": 2, "temp": 22}
-        ]
-    },
-    "New York Style": {
-        "hydration": 62,
-        "stages": [
-            {"hours": 1, "temp": 25},
-            {"hours": 24, "temp": 5},
-            {"hours": 1, "temp": 22}
-        ]
-    },
-    "Chicago Deep Dish": {
-        "hydration": 55,
-        "stages": [
-            {"hours": 3, "temp": 25}
-        ]
-    },
-    "Frozen Pizza": {
-        "hydration": 58,
-        "stages": [
-            {"hours": 2, "temp": 30},
-            {"hours": 1, "temp": -18}  # Simulated freezing
-        ]
+def t(key, lang='en'):
+    texts = {
+        "title": {"en": "🍕 Pizza Dough Calculator", "ja": "🍕 ピザ生地計算ツール"},
+        "balls": {"en": "Number of Dough Balls", "ja": "ドウボールの個数"},
+        "weight": {"en": "Weight per Dough Ball (grams)", "ja": "1個あたりの重さ（g）"},
+        "preset": {"en": "Dough Style Preset", "ja": "ドウスタイルのプリセット"},
+        "hydration": {"en": "Hydration (%)", "ja": "加水率（%）"},
+        "salt": {"en": "Salt (%)", "ja": "塩分（%）"},
+        "fermentation": {"en": "Fermentation Schedule", "ja": "発酵スケジュール"},
+        "calculate": {"en": "Calculate", "ja": "計算する"},
+        "summary": {"en": "Dough Summary", "ja": "生地の概要"},
+        "flour_choice": {"en": "Flour Recommendation", "ja": "おすすめ小麦粉"},
+        "manual_flour": {"en": "Manually select flour", "ja": "手動で小麦粉を選ぶ"},
+        "water_temp": {"en": "Kneading Water Temperature Helper", "ja": "こね水の温度計算"},
     }
+    return texts.get(key, {}).get(lang, key)
+
+st.title(t("title", lang_code))
+
+col1, col2 = st.columns(2)
+with col1:
+    dough_balls = st.number_input(t("balls", lang_code), 1, 50, 4)
+with col2:
+    weight_per_ball = st.number_input(t("weight", lang_code), 100, 1000, 250)
+
+style_options = ["Neapolitan", "New York Style", "Chicago Deep Dish", "Frozen Pizza", "Manual"]
+preset = st.selectbox(t("preset", lang_code), style_options)
+
+hydration_defaults = {
+    "Neapolitan": 65,
+    "New York Style": 62,
+    "Chicago Deep Dish": 55,
+    "Frozen Pizza": 60,
+    "Manual": 60,
 }
+hydration = st.slider(t("hydration", lang_code), 50, 100, hydration_defaults[preset])
+salt_percent = st.slider(t("salt", lang_code), 0.0, 5.0, 2.2)
 
-# ---- UI Starts Here ----
+# Fermentation schedule
+st.subheader(t("fermentation", lang_code))
+fermentation_schedule = []
+for i, label in enumerate(["Room Temp 1", "Cold Ferment", "Room Temp 2"]):
+    col1, col2 = st.columns(2)
+    with col1:
+        time = st.number_input(f"{label} - {t('fermentation', lang_code)} (h)", 0.0, 168.0, [2, 24, 2][i], key=f"t_{i}")
+    with col2:
+        temp = st.number_input(f"{label} Temp (°C)", 0.0, 40.0, [25, 4, 23][i], key=f"temp_{i}")
+    fermentation_schedule.append((time, temp))
 
-st.set_page_config(page_title="Pizza Dough Fermentation Calculator", page_icon="🍕")
-st.title("🍕 Pizza Dough Yeast & Water Calculator")
-st.markdown("Calculate optimal **yeast quantity**, **hydration**, and even **kneading water temperature** based on your dough style and fermentation plan.")
+# Dough calculation
+total_time = sum([h for h, _ in fermentation_schedule])
+total_flour = dough_balls * weight_per_ball / (1 + hydration / 100)
+total_water = total_flour * hydration / 100
+yeast_percent = max(0.01, min(3.0, 1.5 / total_time))
+yeast_grams = total_flour * yeast_percent / 100
+salt_grams = total_flour * salt_percent / 100
 
-# --- Input: Dough Basics ---
-st.header("🧾 Dough Recipe Input")
+if st.button(t("calculate", lang_code)):
+    st.subheader(t("summary", lang_code))
+    st.markdown(f"**Flour**: {total_flour:.1f} g")
+    st.markdown(f"**Water**: {total_water:.1f} g")
+    st.markdown(f"**Yeast**: {yeast_grams:.2f} g ({yeast_percent:.2f}%)")
+    st.markdown(f"**Salt**: {salt_grams:.1f} g ({salt_percent:.2f}%)")
 
-flour_g = st.number_input("Flour Amount (grams)", min_value=100, max_value=2000, value=500, step=50)
+    FLOURS = [
+        {"key": "nuvola", "en": 'Caputo "0" Nuvola', "ja": "カプート ヌーヴォラ", "protein": 12.5, "ash": 0.50, "styles": ["Neapolitan"]},
+        {"key": "cuoco", "en": 'Caputo "00" Chef's Flour', "ja": "カプート クオーコ", "protein": 13.0, "ash": 0.55, "styles": ["Neapolitan", "Long Fermentation"]},
+        {"key": "pizzeria", "en": 'Caputo "00" Pizzeria', "ja": "カプート ピッツェリア", "protein": 12.75, "ash": 0.50, "styles": ["Neapolitan", "General Pizza"]},
+        {"key": "americana", "en": "Caputo Americana", "ja": "カプート アメリカーナ", "protein": 13.5, "ash": 0.55, "styles": ["New York Style"]},
+        {"key": "manitoba", "en": "Caputo Manitoba Oro", "ja": "カプート マニトバ オーロ", "protein": 14.5, "ash": 0.65, "styles": ["Chicago Deep Dish", "Frozen Pizza"]},
+        {"key": "camellia", "en": "Nisshin Camellia", "ja": "カメリア（日清）", "protein": 11.5, "ash": 0.40, "styles": ["All"]},
+        {"key": "lis_dor", "en": "Nisshin Lis D’or", "ja": "リスドォル（日清）", "protein": 11.8, "ash": 0.45, "styles": ["Neapolitan", "French", "Light Crust"]},
+    ]
 
-# Preset Selector
-preset = st.selectbox("Choose a Style Preset (or Manual)", options=["Manual"] + list(PRESETS.keys()))
+    manual = st.checkbox(t("manual_flour", lang_code))
+    if manual:
+        name_list = [f[lang_code] for f in FLOURS]
+        selected = st.selectbox("Choose flour", name_list)
+        flour = next(f for f in FLOURS if f[lang_code] == selected)
+    else:
+        matches = [f for f in FLOURS if preset in f["styles"] or "All" in f["styles"]]
+        flour = matches[0] if matches else None
 
-# Apply preset
-if preset != "Manual":
-    hydration_percent = PRESETS[preset]["hydration"]
-    stages = PRESETS[preset]["stages"]
-else:
-    hydration_percent = st.slider("Hydration (%)", min_value=50, max_value=100, value=70)
-    st.subheader("🧪 Fermentation Stages")
-    num_stages = st.number_input("Number of Stages", min_value=1, max_value=5, value=3)
+    if flour:
+        st.subheader("🧂 " + t("flour_choice", lang_code))
+        st.markdown(f"**{flour[lang_code]}**  
+Protein: {flour['protein']}%  
+Ash: {flour['ash']}%")
 
-    stages = []
-    for i in range(int(num_stages)):
-        st.markdown(f"**Stage {i+1}**")
-        hours = st.number_input(f"  - Time (hours)", key=f"h_{i}", min_value=0.1, value=2.0, step=0.5)
-        temp = st.number_input(f"  - Temperature (°C)", key=f"t_{i}", min_value=0.0, max_value=40.0, value=25.0, step=0.5)
-        stages.append({"hours": hours, "temp": temp})
-
-# Calculate button
-if st.button("🧮 Calculate Yeast"):
-    yeast_percent, yeast_g, water_g, activity = calculate_multistage_yeast(flour_g, hydration_percent, stages)
-
-    st.success("✅ Dough Summary")
-    st.write(f"**Flour**: {flour_g}g")
-    st.write(f"**Water**: {water_g}g ({hydration_percent}%)")
-    st.write(f"**Yeast**: {yeast_g}g ({yeast_percent}%)")
-    st.write(f"**Relative Total Fermentation Activity**: {activity}")
-
-    st.subheader("📄 Recipe Overview")
-    st.code(f"""
-Flour: {flour_g} g
-Water: {water_g} g ({hydration_percent}% hydration)
-Yeast: {yeast_g} g ({yeast_percent}% of flour)
-
-Fermentation Plan:
-""" + "\n".join(
-        [f"- Stage {i+1}: {s['hours']} hrs at {s['temp']}°C" for i, s in enumerate(stages)]
-    ), language="text")
-
-# --- Optional: Kneading Water Temperature ---
-st.header("🌡 Kneading Water Temperature Helper")
-st.markdown("Estimate water temperature to hit a desired final dough temperature.")
-
-with st.expander("🔧 Water Temp Calculator"):
-    dough_temp_goal = st.number_input("Target Final Dough Temp (°C)", value=24.0)
-    room_temp = st.number_input("Room Temp (°C)", value=22.0)
-    flour_temp = st.number_input("Flour Temp (°C)", value=22.0)
-    friction = st.slider("Friction Factor (°C)", min_value=0.0, max_value=10.0, value=4.0, step=0.5)
-
-    water_temp = calc_water_temp(dough_temp_goal, room_temp, flour_temp, friction)
-    st.info(f"Recommended Water Temperature: **{water_temp}°C**")
-
-st.markdown("---")
-st.caption("Developed with ❤️ for pizza makers. Powered by Streamlit.")
+# Water temperature calculator
+st.subheader("💧 " + t("water_temp", lang_code))
+target_temp = st.slider("🎯 Target Dough Temperature (°C)", 20, 30, 25)
+room_temp = st.number_input("🌡️ Room Temperature (°C)", 0.0, 40.0, 24.0)
+flour_temp = st.number_input("🌾 Flour Temperature (°C)", 0.0, 40.0, 22.0)
+friction = st.slider("🌀 Friction Factor (°C)", 0, 10, 5)
+water_temp = target_temp * 3 - (room_temp + flour_temp + friction)
+st.markdown(f"💧 **Recommended Water Temperature**: `{water_temp:.1f} °C`")
