@@ -18,6 +18,7 @@ def t(key, lang='en'):
         "summary": {"en": "Dough Summary", "ja": "生地の概要"},
         "flour_choice": {"en": "Flour Recommendation", "ja": "おすすめ小麦粉"},
         "manual_flour": {"en": "Manually select flour", "ja": "手動で小麦粉を選ぶ"},
+        "choose_flour": {"en": "Choose Flour", "ja": "小麦粉を選択"},
         "water_temp": {"en": "Kneading Water Temperature Helper", "ja": "こね水の温度計算"},
     }
     return texts.get(key, {}).get(lang, key)
@@ -87,7 +88,7 @@ if st.button(t("calculate", lang_code)):
     manual = st.checkbox(t("manual_flour", lang_code))
     if manual:
         name_list = [f[lang_code] for f in FLOURS]
-        selected = st.selectbox("Choose flour", name_list)
+        selected = st.selectbox(t("choose_flour", lang_code), name_list)
         flour = next(f for f in FLOURS if f[lang_code] == selected)
     else:
         matches = [f for f in FLOURS if preset in f["styles"] or "All" in f["styles"]]
