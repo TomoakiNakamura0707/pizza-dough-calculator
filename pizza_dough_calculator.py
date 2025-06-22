@@ -2,7 +2,7 @@ nimport streamlit as st
 # (C) Copyright All Rights Reserved. Tomoaki Nakamura 2025/06/22
 
 st.set_page_config(page_title="Pizza Dough Calculator", page_icon="🍕", layout="centered")
-lang = st.radio("🌐 Language / 言語", ["日本語","English"], horizontal=True)
+lang = st.radio("🌐 Language / 言語", ["日本語","English"], horizontal=False)
 lang_code = "en" if lang == "English" else "ja"
 
 def t(key, lang='ja'):
@@ -28,7 +28,7 @@ col1, col2 = st.columns(2)
 with col1:
     dough_balls = st.number_input(t("balls", lang_code), 1, 50, 3)
 with col2:
-    weight_per_ball = st.number_input(t("weight", lang_code), 100, 1000, 200)
+    weight_per_ball = st.number_input(t("weight", lang_code), 100, 1000, 190)
 
 style_options = ["Neapolitan", "New York Style", "Chicago Deep Dish", "Frozen Pizza", "Manual"]
 preset = st.selectbox(t("preset", lang_code), style_options)
