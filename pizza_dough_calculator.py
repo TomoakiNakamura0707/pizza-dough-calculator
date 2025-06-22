@@ -51,7 +51,7 @@ for i, label in enumerate(["Room Temp 1", "Cold Ferment", "Room Temp 2"]):
     with col1:
         time = st.number_input( f"{label} - {t('fermentation', lang_code)} (h)", 0.0, 168.0, float([2, 24, 2][i]), key=f"t_{i}")
     with col2:
-        temp = st.number_input(f"{label} Temp (°C)", 0.0, 40.0, [25, 4, 23][i], key=f"temp_{i}")
+        temp = st.number_input(f"{label} Temp (°C)", 0.0, 40.0, float([25, 4, 23][i]), key=f"temp_{i}")
     fermentation_schedule.append((time, temp))
 
 # Dough calculation
