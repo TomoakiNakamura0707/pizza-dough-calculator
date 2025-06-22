@@ -1,4 +1,5 @@
 import streamlit as st
+#(C) Copyright All Righs Reserved.  Tomoaki Nakamura 2025/6/22
 
 st.set_page_config(page_title="Pizza Dough Calculator", page_icon="🍕", layout="centered")
 lang = st.radio("🌐 Language / 言語", ["日本語", "English"], horizontal=True)
@@ -78,24 +79,16 @@ if st.button(t("calculate", lang_code)):
     FLOURS = [
         {"key": "nuvola", "en": "Caputo 0 Nuvola", "ja": "ヌーヴォラ(カプート)", "protein": 12.5, "ash": 0.50, "styles": ["Neapolitan"]},
         {"key": "cuoco", "en": "Caputo 00 Chef's Flour", "ja": "サッコロッソクォーコ(カプート)", "protein": 13.0, "ash": 0.55, "styles": ["Neapolitan", "Long Fermentation"]},
-        {"key": "pizzeria", "en": "Caputo 00 Pizzeria Blue", "ja": "ピッツェリア(カプート)", "protein": 12.75, "ash": 0.50, "styles": ["Neapolitan", "General Pizza"]},
+        {"key": "pizzeria", "en": "Caputo 00 Pizzeria Blue", "ja": "ピッツェリア(カプート)", "protein": 12.75, "ash": 0.50, "styles": ["Neapolitan", "All"]},
         {"key": "americana", "en": "Caputo Americana", "ja": "アメリカーナ(カプート)", "protein": 13.5, "ash": 0.55, "styles": ["New York Style"]},
         {"key": "manitoba", "en": "Caputo Manitoba Oro", "ja": "マニトバ オーロ(カプート)", "protein": 14.5, "ash": 0.65, "styles": ["Chicago Deep Dish", "Frozen Pizza"]},
         {"key": "camellia", "en": "Nisshin Camellia", "ja": "カメリア（日清）", "protein": 11.5, "ash": 0.40, "styles": ["All"]},
         {"key": "lis_dor", "en": "Nisshin Lis D’or", "ja": "リスドォル（日清）", "protein": 11.8, "ash": 0.45, "styles": ["Neapolitan", "French", "Light Crust"]},
     ]
 
-    manual = st.checkbox(t("manual_flour", lang_code))
-    if manual:
-        name_list = [f[lang_code] for f in FLOURS]
-        selected = st.selectbox(t("choose_flour", lang_code), name_list)
-        flour = next(f for f in FLOURS if f[lang_code] == selected)
-    else:
-        matches = [f for f in FLOURS if preset in f["styles"] or "All" in f["styles"]]
-        flour = matches[0] if matches else None
-
-    if flour:
-        st.subheader("🧂 " + t("flour_choice", lang_code))
+    matches = [f for f in FLOURS if preset in f["styles"] or "All" in f["styles"]]
+    st.subheader("🧂 " + t("flour_choice", lang_code))
+    for flour in matches:
         st.markdown(f"**{flour[lang_code]}**  Protein: {flour['protein']}%  Ash: {flour['ash']}%")
 
 st.subheader("💧 " + t("water_temp", lang_code))
