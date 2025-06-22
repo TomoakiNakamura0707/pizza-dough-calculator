@@ -2,7 +2,7 @@ import streamlit as st
 # (C) Copyright All Rights Reserved. Tomoaki Nakamura 2025/06/22
 
 st.set_page_config(page_title="Pizza Dough Calculator", page_icon="🍕", layout="centered")
-lang = st.radio("🌐 Language / 言語", ["English","日本語"], horizontal=False)
+lang = st.radio("🌐 Language / 言語", ["日本語","English"], horizontal=True)
 lang_code = "en" if lang == "English" else "ja"
 
 def t(key, lang='ja'):
