@@ -1,11 +1,10 @@
 import streamlit as st
-# (C) Copyright All Rights Reserved. Tomoaki Nakamura 2025/06/22
 
 st.set_page_config(page_title="Pizza Dough Calculator", page_icon="🍕", layout="centered")
-lang = st.radio("🌐 Language / 言語", ["日本語","English"], horizontal=True)
-lang_code = "en" if lang == "English" else "ja"
+lang = st.radio("🌐 Language / 言語", ["日本語", "English"], horizontal=True)
+lang_code = "ja" if lang == "日本語" else "en"
 
-def t(key, lang='ja'):
+def t(key, lang='en'):
     texts = {
         "title": {"en": "🍕 Pizza Dough Calculator", "ja": "🍕 ピザ生地計算ツール"},
         "balls": {"en": "Number of Dough Balls", "ja": "ドウボールの個数"},
@@ -13,6 +12,7 @@ def t(key, lang='ja'):
         "preset": {"en": "Dough Style Preset", "ja": "ドウスタイルのプリセット"},
         "hydration": {"en": "Hydration (%)", "ja": "加水率（%）"},
         "salt": {"en": "Salt (%)", "ja": "塩分（%）"},
+        "olive_oil": {"en": "Olive Oil (%)", "ja": "オリーブオイル（%）"},
         "fermentation": {"en": "Fermentation Schedule", "ja": "発酵スケジュール"},
         "calculate": {"en": "Calculate", "ja": "計算する"},
         "summary": {"en": "Dough Summary", "ja": "生地の概要"},
@@ -43,24 +43,27 @@ hydration_defaults = {
 hydration = st.slider(t("hydration", lang_code), 50, 100, hydration_defaults[preset])
 salt_percent = st.slider(t("salt", lang_code), 0.0, 5.0, 2.2)
 
-# Fermentation schedule
+olive_oil_percent = 0.0
+if preset == "New York Style":
+    olive_oil_percent = st.slider(t("olive_oil", lang_code), 0.0, 5.0, 2.0)
+
 st.subheader(t("fermentation", lang_code))
 fermentation_schedule = []
 for i, label in enumerate(["Room Temp 1", "Cold Ferment", "Room Temp 2"]):
     col1, col2 = st.columns(2)
     with col1:
-        time = st.number_input( f"{label} - {t('fermentation', lang_code)} (h)", 0.0, 168.0, float([2, 24, 2][i]), key=f"t_{i}")
+        time = st.number_input(f"{label} - {t('fermentation', lang_code)} (h)", 0.0, 168.0, float([2, 24, 2][i]), key=f"t_{i}")
     with col2:
         temp = st.number_input(f"{label} Temp (°C)", 0.0, 40.0, float([25, 4, 23][i]), key=f"temp_{i}")
     fermentation_schedule.append((time, temp))
 
-# Dough calculation
 total_time = sum([h for h, _ in fermentation_schedule])
 total_flour = dough_balls * weight_per_ball / (1 + hydration / 100)
 total_water = total_flour * hydration / 100
 yeast_percent = max(0.01, min(3.0, 1.5 / total_time))
 yeast_grams = total_flour * yeast_percent / 100
 salt_grams = total_flour * salt_percent / 100
+olive_oil_grams = total_flour * olive_oil_percent / 100
 
 if st.button(t("calculate", lang_code)):
     st.subheader(t("summary", lang_code))
@@ -68,15 +71,17 @@ if st.button(t("calculate", lang_code)):
     st.markdown(f"**Water**: {total_water:.1f} g")
     st.markdown(f"**Yeast**: {yeast_grams:.2f} g ({yeast_percent:.2f}%)")
     st.markdown(f"**Salt**: {salt_grams:.1f} g ({salt_percent:.2f}%)")
+    if olive_oil_percent > 0:
+        st.markdown(f"**Olive Oil**: {olive_oil_grams:.1f} g ({olive_oil_percent:.2f}%)")
 
     FLOURS = [
-        {"key": "nuvola", "en": "Caputo 0 Nuvola", "ja": "ヌーヴォラ（カプート）", "protein": 12.5, "ash": 0.50, "styles": ["Neapolitan"]},
-        {"key": "cuoco", "en": "Caputo 00 Chef's Flour", "ja": "クオーコ（カプート）", "protein": 13.0, "ash": 0.55, "styles": ["Neapolitan", "Long Fermentation"]},
-        {"key": "pizzeria", "en": "Caputo 00 Pizzeria Blue", "ja": "ピッツェリア（カプート）", "protein": 12.75, "ash": 0.50, "styles": ["Neapolitan", "General Pizza"]},
-        {"key": "americana", "en": "Caputo Americana", "ja": "アメリカーナ（カプート）", "protein": 13.5, "ash": 0.55, "styles": ["New York Style"]},
-        {"key": "manitoba", "en": "Caputo Manitoba Oro", "ja": "マニトバ オーロ（カプート）", "protein": 14.5, "ash": 0.65, "styles": ["Chicago Deep Dish", "Frozen Pizza"]},
+        {"key": "nuvola", "en": "Caputo 0 Nuvola", "ja": "ヌーヴォラ(カプート)", "protein": 12.5, "ash": 0.50, "styles": ["Neapolitan"]},
+        {"key": "cuoco", "en": "Caputo 00 Chef's Flour", "ja": "サッコロッソクォーコ(カプート)", "protein": 13.0, "ash": 0.55, "styles": ["Neapolitan", "Long Fermentation"]},
+        {"key": "pizzeria", "en": "Caputo 00 Pizzeria Blue", "ja": "ピッツェリア(カプート)", "protein": 12.75, "ash": 0.50, "styles": ["Neapolitan", "General Pizza"]},
+        {"key": "americana", "en": "Caputo Americana", "ja": "アメリカーナ(カプート)", "protein": 13.5, "ash": 0.55, "styles": ["New York Style"]},
+        {"key": "manitoba", "en": "Caputo Manitoba Oro", "ja": "マニトバ オーロ(カプート)", "protein": 14.5, "ash": 0.65, "styles": ["Chicago Deep Dish", "Frozen Pizza"]},
         {"key": "camellia", "en": "Nisshin Camellia", "ja": "カメリア（日清）", "protein": 11.5, "ash": 0.40, "styles": ["All"]},
-        {"key": "lis_dor", "en": "Nisshin Lis D'or", "ja": "リスドォル（日清）", "protein": 11.8, "ash": 0.45, "styles": ["Neapolitan", "French", "Light Crust"]},
+        {"key": "lis_dor", "en": "Nisshin Lis D’or", "ja": "リスドォル（日清）", "protein": 11.8, "ash": 0.45, "styles": ["Neapolitan", "French", "Light Crust"]},
     ]
 
     manual = st.checkbox(t("manual_flour", lang_code))
@@ -90,9 +95,10 @@ if st.button(t("calculate", lang_code)):
 
     if flour:
         st.subheader("🧂 " + t("flour_choice", lang_code))
-        st.markdown(f"**{flour[lang_code]}**  Protein: {flour['protein']}%  Ash: {flour['ash']}%")
+        st.markdown(f"**{flour[lang_code]}**  
+Protein: {flour['protein']}%  
+Ash: {flour['ash']}%")
 
-# Water temperature calculator
 st.subheader("💧 " + t("water_temp", lang_code))
 target_temp = st.slider("🎯 Target Dough Temperature (°C)", 20, 30, 25)
 room_temp = st.number_input("🌡️ Room Temperature (°C)", 0.0, 40.0, 24.0)
