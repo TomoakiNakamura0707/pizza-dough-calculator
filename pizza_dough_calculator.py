@@ -1,10 +1,21 @@
 import streamlit as st
 #(C) Copyright All Righs Reserved.  Tomoaki Nakamura 2025/6/22
 
-st.set_page_config(page_title="Pizza Dough Calculator", page_icon="🍕", layout="centered")
+# 🌐 Language toggle
 lang = st.radio("🌐 Language / 言語", ["日本語", "English"], horizontal=True)
 lang_code = "ja" if lang == "日本語" else "en"
 
+# 🌡 Temperature unit toggle
+unit = st.radio("Temperature Unit / 温度単位", ["C", "F"], horizontal=True)
+use_fahrenheit = unit == "F"
+
+def convert_to_c(f):
+    return (f - 32) * 5.0 / 9.0
+
+def convert_to_f(c):
+    return c * 9.0 / 5.0 + 32
+
+# 🔤 Text translation
 def t(key, lang='en'):
     texts = {
         "title": {"en": "🍕 Pizza Dough Calculator", "ja": "🍕 ピザ生地計算ツール"},
@@ -18,10 +29,13 @@ def t(key, lang='en'):
         "calculate": {"en": "Calculate", "ja": "計算する"},
         "summary": {"en": "Dough Summary", "ja": "生地の概要"},
         "flour_choice": {"en": "Flour Recommendation", "ja": "おすすめ小麦粉"},
+        "manual_flour": {"en": "Manually select flour", "ja": "手動で小麦粉を選ぶ"},
+        "choose_flour": {"en": "Choose Flour", "ja": "小麦粉を選択"},
         "water_temp": {"en": "Kneading Water Temperature Helper", "ja": "こね水の温度計算"},
     }
     return texts.get(key, {}).get(lang, key)
 
+st.set_page_config(page_title=t("title", lang_code), page_icon="🍕", layout="centered")
 st.title(t("title", lang_code))
 
 col1, col2 = st.columns(2)
@@ -54,7 +68,9 @@ for i, label in enumerate(["Room Temp 1", "Cold Ferment", "Room Temp 2"]):
     with col1:
         time = st.number_input(f"{label} - {t('fermentation', lang_code)} (h)", 0.0, 168.0, float([2, 24, 2][i]), key=f"t_{i}")
     with col2:
-        temp = st.number_input(f"{label} Temp (°C)", 0.0, 40.0, float([25, 4, 23][i]), key=f"temp_{i}")
+        temp = st.number_input(f"{label} Temp (°{'F' if use_fahrenheit else 'C'})", 0.0, 120.0 if use_fahrenheit else 40.0, float([77, 39, 73][i]) if use_fahrenheit else float([25, 4, 23][i]), key=f"temp_{i}")
+        if use_fahrenheit:
+            temp = convert_to_c(temp)
     fermentation_schedule.append((time, temp))
 
 total_time = sum([h for h, _ in fermentation_schedule])
@@ -84,15 +100,25 @@ if st.button(t("calculate", lang_code)):
         {"key": "lis_dor", "en": "Nisshin Lis D’or", "ja": "リスドォル（日清）", "protein": 11.8, "ash": 0.45, "styles": ["Neapolitan", "French", "Light Crust"]},
     ]
 
-    matches = [f for f in FLOURS if preset in f["styles"] or "All" in f["styles"]]
-    st.subheader("🧂 " + t("flour_choice", lang_code))
-    for flour in matches:
-        st.markdown(f"**{flour[lang_code]}**  Protein: {flour['protein']}%  Ash: {flour['ash']}%")
 
+        matches = [f for f in FLOURS if preset in f["styles"] or "All" in f["styles"]]
+        st.subheader("🧂 " + t("flour_choice", lang_code))
+        for flour in matches:
+            st.markdown(f"**{flour[lang_code]}**  Protein: {flour['protein']}%  Ash: {flour['ash']}%")
+
+# 水温計算
 st.subheader("💧 " + t("water_temp", lang_code))
-target_temp = st.slider("🎯 Target Dough Temperature (°C)", 20, 30, 25)
-room_temp = st.number_input("🌡️ Room Temperature (°C)", 0.0, 40.0, 24.0)
-flour_temp = st.number_input("🌾 Flour Temperature (°C)", 0.0, 40.0, 22.0)
-friction = st.slider("🌀 Friction Factor (°C)", 0, 10, 5)
+target_temp = st.slider("🎯 Target Dough Temperature", 20, 30, 25) if not use_fahrenheit else st.slider("🎯 Target Dough Temperature", 68, 86, 77)
+room_temp = st.number_input("🌡️ Room Temperature", value=24.0 if not use_fahrenheit else 75.2)
+flour_temp = st.number_input("🌾 Flour Temperature", value=22.0 if not use_fahrenheit else 71.6)
+friction = st.slider("🌀 Friction Factor", 0, 10, 5)
+
+# 温度を °C に換算して計算
+if use_fahrenheit:
+    target_temp = convert_to_c(target_temp)
+    room_temp = convert_to_c(room_temp)
+    flour_temp = convert_to_c(flour_temp)
+
 water_temp = target_temp * 3 - (room_temp + flour_temp + friction)
-st.markdown(f"💧 **Recommended Water Temperature**: `{water_temp:.1f} °C`")
+water_display = f"{convert_to_f(water_temp):.1f} °F" if use_fahrenheit else f"{water_temp:.1f} °C"
+st.markdown(f"💧 **Recommended Water Temperature**: `{water_display}`")
