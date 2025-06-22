@@ -101,10 +101,10 @@ if st.button(t("calculate", lang_code)):
     ]
 
 
-        matches = [f for f in FLOURS if preset in f["styles"] or "All" in f["styles"]]
-        st.subheader("🧂 " + t("flour_choice", lang_code))
-        for flour in matches:
-            st.markdown(f"**{flour[lang_code]}**  Protein: {flour['protein']}%  Ash: {flour['ash']}%")
+    matches = [f for f in FLOURS if preset in f["styles"] or "All" in f["styles"]]
+    st.subheader("🧂 " + t("flour_choice", lang_code))
+    for flour in matches:
+        st.markdown(f"**{flour[lang_code]}**  Protein: {flour['protein']}%  Ash: {flour['ash']}%")
 
 # 水温計算
 st.subheader("💧 " + t("water_temp", lang_code))
