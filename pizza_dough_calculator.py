@@ -42,10 +42,7 @@ hydration_defaults = {
 }
 hydration = st.slider(t("hydration", lang_code), 50, 100, hydration_defaults[preset])
 salt_percent = st.slider(t("salt", lang_code), 0.0, 5.0, 2.2)
-
-olive_oil_percent = 0.0
-if preset == "New York Style":
-    olive_oil_percent = st.slider(t("olive_oil", lang_code), 0.0, 5.0, 2.0)
+olive_oil_percent = st.slider(t("olive_oil", lang_code), 0.0, 5.0, 2.0)
 
 st.subheader(t("fermentation", lang_code))
 fermentation_schedule = []
