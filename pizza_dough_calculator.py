@@ -26,9 +26,9 @@ st.title(t("title", lang_code))
 
 col1, col2 = st.columns(2)
 with col1:
-    dough_balls = st.number_input(t("balls", lang_code), 1, 50, 4)
+    dough_balls = st.number_input(t("balls", lang_code), 1, 50, 3)
 with col2:
-    weight_per_ball = st.number_input(t("weight", lang_code), 100, 1000, 250)
+    weight_per_ball = st.number_input(t("weight", lang_code), 100, 1000, 200)
 
 style_options = ["Neapolitan", "New York Style", "Chicago Deep Dish", "Frozen Pizza", "Manual"]
 preset = st.selectbox(t("preset", lang_code), style_options)
