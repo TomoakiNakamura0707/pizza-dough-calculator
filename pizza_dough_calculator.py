@@ -18,8 +18,6 @@ def t(key, lang='en'):
         "calculate": {"en": "Calculate", "ja": "計算する"},
         "summary": {"en": "Dough Summary", "ja": "生地の概要"},
         "flour_choice": {"en": "Flour Recommendation", "ja": "おすすめ小麦粉"},
-        "manual_flour": {"en": "Manually select flour", "ja": "手動で小麦粉を選ぶ"},
-        "choose_flour": {"en": "Choose Flour", "ja": "小麦粉を選択"},
         "water_temp": {"en": "Kneading Water Temperature Helper", "ja": "こね水の温度計算"},
     }
     return texts.get(key, {}).get(lang, key)
