@@ -42,7 +42,10 @@ hydration_defaults = {
 }
 hydration = st.slider(t("hydration", lang_code), 50, 100, hydration_defaults[preset])
 salt_percent = st.slider(t("salt", lang_code), 0.0, 5.0, 2.2)
-olive_oil_percent = st.slider(t("olive_oil", lang_code), 0.0, 5.0, 2.0)
+
+olive_oil_percent = 0.0
+if preset == "New York Style":
+    olive_oil_percent = st.slider(t("olive_oil", lang_code), 0.0, 5.0, 2.0)
 
 st.subheader(t("fermentation", lang_code))
 fermentation_schedule = []
@@ -92,9 +95,7 @@ if st.button(t("calculate", lang_code)):
 
     if flour:
         st.subheader("🧂 " + t("flour_choice", lang_code))
-        st.markdown(f"**{flour[lang_code]}**  
-Protein: {flour['protein']}%  
-Ash: {flour['ash']}%")
+        st.markdown(f"**{flour[lang_code]}**  Protein: {flour['protein']}%  Ash: {flour['ash']}%")
 
 st.subheader("💧 " + t("water_temp", lang_code))
 target_temp = st.slider("🎯 Target Dough Temperature (°C)", 20, 30, 25)
