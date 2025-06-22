@@ -1,4 +1,4 @@
-nimport streamlit as st
+import streamlit as st
 # (C) Copyright All Rights Reserved. Tomoaki Nakamura 2025/06/22
 
 st.set_page_config(page_title="Pizza Dough Calculator", page_icon="🍕", layout="centered")
