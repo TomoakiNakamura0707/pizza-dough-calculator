@@ -40,16 +40,16 @@ st.title(t("title", lang_code))
 
 col1, col2 = st.columns(2)
 with col1:
-    dough_balls = st.number_input(t("balls", lang_code), 1, 50, 3)
+    dough_balls = st.number_input(t("balls", lang_code), 1, 50, 2)
 with col2:
-    weight_per_ball = st.number_input(t("weight", lang_code), 100, 1000, 183)
+    weight_per_ball = st.number_input(t("weight", lang_code), 100, 1000, 300)
 
 style_options = ["Neapolitan", "New York Style", "Chicago Deep Dish", "Frozen Pizza", "Manual"]
 preset = st.selectbox(t("preset", lang_code), style_options)
 
 hydration_defaults = {
-    "Neapolitan": 65,
-    "New York Style": 62,
+    "Neapolitan": 58,
+    "New York Style": 58,
     "Chicago Deep Dish": 55,
     "Frozen Pizza": 60,
     "Manual": 60,
@@ -66,7 +66,7 @@ fermentation_schedule = []
 for i, label in enumerate(["Room Temp 1", "Cold Ferment", "Room Temp 2"]):
     col1, col2 = st.columns(2)
     with col1:
-        time = st.number_input(f"{label} - {t('fermentation', lang_code)} (h)", 0.0, 168.0, float([2, 24, 2][i]), key=f"t_{i}")
+        time = st.number_input(f"{label} - {t('fermentation', lang_code)} (h)", 0.0, 168.0, float([6,0,0][i]), key=f"t_{i}")
     with col2:
         temp = st.number_input(f"{label} Temp (°{'F' if use_fahrenheit else 'C'})", 0.0, 120.0 if use_fahrenheit else 40.0, float([77, 39, 73][i]) if use_fahrenheit else float([25, 4, 23][i]), key=f"temp_{i}")
         if use_fahrenheit:
@@ -108,9 +108,9 @@ if st.button(t("calculate", lang_code)):
 
 # 水温計算
 st.subheader("💧 " + t("water_temp", lang_code))
-target_temp = st.slider("🎯 Target Dough Temperature", 20, 30, 25) if not use_fahrenheit else st.slider("🎯 Target Dough Temperature", 68, 86, 77)
-room_temp = st.number_input("🌡️ Room Temperature", value=24.0 if not use_fahrenheit else 75.2)
-flour_temp = st.number_input("🌾 Flour Temperature", value=22.0 if not use_fahrenheit else 71.6)
+target_temp = st.slider("🎯 Target Dough Temperature", 20, 30, 27) if not use_fahrenheit else st.slider("🎯 Target Dough Temperature", 68, 86, 77)
+room_temp = st.number_input("🌡️ Room Temperature", value=25.0 if not use_fahrenheit else 75.2)
+flour_temp = st.number_input("🌾 Flour Temperature", value=25.0 if not use_fahrenheit else 71.6)
 friction = st.slider("🌀 Friction Factor", 0, 10, 5)
 
 # 温度を °C に換算して計算
