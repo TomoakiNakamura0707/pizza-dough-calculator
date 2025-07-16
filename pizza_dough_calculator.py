@@ -2,7 +2,7 @@ import streamlit as st
 #(C) Copyright All Righs Reserved.  Tomoaki Nakamura 2025/6/22
 
 # 🌐 Language toggle
-lang = st.radio("🌐 Language / 言語", ["日本語", "English"], horizontal=True)
+lang = st.radio("🌐 Language / 言語", ["English","日本語"], horizontal=True)
 lang_code = "ja" if lang == "日本語" else "en"
 
 # 🌡 Temperature unit toggle
