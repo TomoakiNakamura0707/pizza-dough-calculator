@@ -48,8 +48,8 @@ style_options = ["Neapolitan", "New York Style", "Chicago Deep Dish", "Frozen Pi
 preset = st.selectbox(t("preset", lang_code), style_options)
 
 hydration_defaults = {
-    "Neapolitan": 58,
-    "New York Style": 58,
+    "Neapolitan": 65,
+    "New York Style": 65,
     "Chicago Deep Dish": 55,
     "Frozen Pizza": 60,
     "Manual": 60,
@@ -74,12 +74,12 @@ for i, label in enumerate(["Room Temp 1", "Cold Ferment", "Room Temp 2"]):
     fermentation_schedule.append((time, temp))
 
 total_time = sum([h for h, _ in fermentation_schedule])
-total_flour = dough_balls * weight_per_ball / (1 + hydration / 100)
-total_water = total_flour * hydration / 100
 yeast_percent = max(0.01, min(3.0, 1.5 / total_time))
 yeast_grams = total_flour * yeast_percent / 100
 salt_grams = total_flour * salt_percent / 100
 olive_oil_grams = total_flour * olive_oil_percent / 100
+total_flour = dough_balls * weight_per_ball / (1 + hydration / 100)-yeast_grams-salt_grams-olive_oil_grams
+total_water = total_flour * hydration / 100
 
 if st.button(t("calculate", lang_code)):
     st.subheader(t("summary", lang_code))
